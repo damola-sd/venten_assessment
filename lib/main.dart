@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'filter.dart';
+import 'filter_display.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,6 +13,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  Future<List<Filter>> filters;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,13 +34,14 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'My Filters'),
+      home: MyHomePage(title: 'My Filters', filters: filters,),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  Future<List<Filter>> filters;
+  MyHomePage({Key key, this.title, this.filters}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -54,9 +59,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<List<Filter>> filters;
 
   List<List<dynamic>> car_owners_data = [];
 
+
+  @override
+  void initState() {
+    super.initState();
+    filters = fetchFilters();
+  }
   loadCsv() async {
     final carOwners = await rootBundle.loadString('assets/car_ownsers_data.csv');
     print(carOwners);
@@ -76,11 +88,30 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Column(), // This trailing comma makes auto-formatting nicer for build methods.
+      body: FutureBuilder<List<Filter>>(
+        future: filters, builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error); 
+                  return snapshot.hasData ? FilterBoxList(items: snapshot.data) :
+                  
+                  // return the ListView widget : 
+                  Center(child: CircularProgressIndicator()); 
+        },
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
 
+List<Filter> parseFilters(String responseBody) { 
+   final parsed = json.decode(responseBody).cast<Map<String, dynamic>>(); 
+   return parsed.map<Filter>((json) =>Filter.fromMap(json)).toList(); 
+} 
+
 Future<List<Filter>> fetchFilters() async {
-  final response = await http.get()
+  final data = await http.get('https://ven10.co/assessment/filter.json');
+  if (data.statusCode == 200) {
+    return parseFilters(data.body);
+
+  }else {
+    throw Exception('Failed to load filters');
+  }
 }
