@@ -87,7 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final data = await rootBundle.loadString('venten/car_ownsers_data.csv');
     // final data2 = File.readAsLinesSync('venten/car_ownsers_data.csv')
     List<List<dynamic>> csvData = CsvToListConverter().convert(data);
-    // print(csvData);
     var owners = new List<CarOwner>();
     for (var i = 1; i < csvData.length; i++) {
       var tempy = CarOwner.fromList(csvData[i]);

@@ -18,8 +18,7 @@ class FilterBoxList extends StatelessWidget {
           child: FilterBox(item: items[index]),
           onTap: () {
             var filteredOwners = filterData(owners, items[index]);
-            print(owners);
-            print(filteredOwners);
+
             Navigator.push(
               context,
               MaterialPageRoute(
