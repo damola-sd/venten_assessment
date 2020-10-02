@@ -6,6 +6,7 @@ class CarOwnersPage extends StatelessWidget {
   CarOwnersPage({Key key, this.owners}) : super(key: key);
   List<CarOwner> owners;
 
+  final noResult = SnackBar(content: Text('This filter returns no results'));
   final primary = Color(0xFF696B9E);
   final secondary = Color(0xFFF29A94);
   final TextStyle dropdownMenuItem =
@@ -124,7 +125,7 @@ class CarOwnersPage extends StatelessWidget {
                   padding: EdgeInsets.only(top: 145),
                   height: MediaQuery.of(context).size.height,
                   width: double.infinity,
-                  child: ListView.builder(
+                  child: owners.length == 0 ? Scaffold.of(context).showSnackBar(noResult) : ListView.builder(
                       itemCount: owners.length,
                       itemBuilder: (BuildContext context, int index) {
                         return ownerCard(context, index);
