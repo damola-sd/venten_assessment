@@ -125,7 +125,7 @@ class CarOwnersPage extends StatelessWidget {
                   padding: EdgeInsets.only(top: 145),
                   height: MediaQuery.of(context).size.height,
                   width: double.infinity,
-                  child: owners.length == 0 ? Scaffold.of(context).showSnackBar(noResult) : ListView.builder(
+                  child: ListView.builder(
                       itemCount: owners.length,
                       itemBuilder: (BuildContext context, int index) {
                         return ownerCard(context, index);
